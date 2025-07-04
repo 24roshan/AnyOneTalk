@@ -1,0 +1,42 @@
+{
+    "name": "anyonetalk-fullstack",
+    "version": "1.0.0",
+    "description": "Full-stack real-time chat app with React and Node.js",
+    "main": "server.js",
+    "type": "module",
+    "scripts": {
+      "dev": "vite",                   
+      "start": "node server.js",       
+      "build": "vite build",
+      "preview": "vite preview"
+    },
+    "author": "Roshan Jha",
+    "license": "ISC",
+    "dependencies": {
+      "@emoji-mart/data": "^1.2.1",
+      "@emoji-mart/react": "^1.1.1",
+      "axios": "^1.10.0",
+      "emoji-mart": "^5.6.0",
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0",
+      "react-icons": "^5.5.0",
+      "react-router-dom": "^7.6.2",
+      "socket.io-client": "^4.8.1",
+  
+      "bcrypt": "^6.0.0",
+      "bcryptjs": "^3.0.2",
+      "cookie-parser": "^1.4.7",
+      "cors": "^2.8.5",
+      "dotenv": "^16.5.0",
+      "express": "^5.1.0",
+      "express-fileupload": "^1.5.1",
+      "jsonwebtoken": "^9.0.2",
+      "mysql": "^2.18.1",
+      "mysql2": "^3.14.1",
+      "socket.io": "^4.8.1"
+    },
+    "devDependencies": {
+      "vite": "^6.3.5"
+    }
+  }
+  
