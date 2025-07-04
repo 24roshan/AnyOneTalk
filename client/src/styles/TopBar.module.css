@@ -1,0 +1,38 @@
+/* src/styles/TopBar.module.css */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(90deg, #0f0c29, #302b63, #24243e);
+    padding: 12px 24px;
+    color: #00ffe0;
+    font-family: 'Orbitron', sans-serif;
+    box-shadow: 0 4px 10px rgba(0, 255, 255, 0.3);
+    border-bottom: 2px solid #ff00ff;
+    z-index: 200;
+  }
+  
+  .logo {
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px #00ffe0;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 16px;
+  }
+  
+  .logoutBtn {
+    background: none;
+    border: none;
+    color: #ff00ff;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .logoutBtn:hover {
+    color: #00ffe0;
+    transform: scale(1.2);
+  }
+  

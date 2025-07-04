@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&display=swap');
+
+.container {
+  height: 100vh;
+  background: url('/images/neotokyo.jpg') center/cover no-repeat;
+  position: relative;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  font-size: 4rem;
+  color: #00ffe0;
+  text-shadow: 0 0 20px #ff00ff;
+  animation: flicker 2s infinite alternate;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #cccccc;
+  margin: 1rem 0;
+}
+
+.buttons {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #000;
+  background: linear-gradient(135deg, #00ffe0, #fc00ff);
+  text-decoration: none;
+  box-shadow: 0 0 12px #00ffe0;
+  transition: transform 0.2s ease;
+}
+
+.button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px #ff00ff;
+}
+
+@keyframes flicker {
+  0% {
+    text-shadow: 0 0 10px #00ffe0;
+  }
+  100% {
+    text-shadow: 0 0 30px #ff00ff;
+  }
+}
