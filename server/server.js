@@ -13,9 +13,10 @@ import chatRoutes from "./routes/chatRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import groupRoutes from "./routes/groupRoutes.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 dotenv.config();
 
 const app = express();
@@ -29,12 +30,14 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(fileUpload());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/groups", groupRoutes);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api", userRoutes);
+
 const onlineUsers = new Map();
 
 io.on("connection", (socket) => {
@@ -56,7 +59,6 @@ io.on("connection", (socket) => {
     io.emit("online_users", Array.from(onlineUsers.values()));
   });
 
-  
   socket.on("join_chat", ({ chatId }) => {
     console.log(`🔗 ${socket.userId} joined chat room: ${chatId}`);
     socket.join(chatId);
@@ -79,6 +81,43 @@ io.on("connection", (socket) => {
   socket.on("react_message", ({ msgId, emoji }) => {
     io.emit("message_reacted", { msgId, emoji });
   });
+
+  // ✅ EDIT message
+  socket.on("edit_message", ({ id, newContent }) => {
+    if (!id || !newContent) return;
+
+    db.query(
+      "UPDATE messages SET content = ?, edited = 1 WHERE id = ?",
+      [newContent, id],
+      (err, result) => {
+        if (err) {
+          console.error("❌ Error editing message:", err);
+          return;
+        }
+        console.log(`✏️ Message ${id} edited`);
+        io.emit("messageEdited", { id, newContent });
+      }
+    );
+  });
+
+  // ✅ DELETE message
+  socket.on("delete_message", ({ id }) => {
+    if (!id) return;
+
+    db.query(
+      "UPDATE messages SET deleted = 1 WHERE id = ?",
+      [id],
+      (err, result) => {
+        if (err) {
+          console.error("❌ Error deleting message:", err);
+          return;
+        }
+        console.log(`🗑️ Message ${id} marked as deleted`);
+        io.emit("messageDeleted", { id });
+      }
+    );
+  });
+
   socket.on("disconnect", () => {
     if (socket.userId) {
       onlineUsers.delete(socket.userId);
@@ -87,7 +126,6 @@ io.on("connection", (socket) => {
     }
   });
 });
-
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

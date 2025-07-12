@@ -1,7 +1,12 @@
 import express from "express";
 import db from "../config/db.js";
+import { deleteMessage,editMessage } from "../controllers/messageController.js";
+import verifyToken from "../middleware/verifyToken.js"; // ✅ Your custom auth middleware
+
 
 const router = express.Router();
+router.put("/:id",verifyToken,editMessage);
+router.delete("/:id",verifyToken,deleteMessage);
 router.get("/:chatId", (req, res) => {
   const { page = 1, limit = 20 } = req.query;
   const offset = (page - 1) * limit;
