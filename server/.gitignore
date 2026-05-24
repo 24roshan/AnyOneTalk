@@ -1,2 +1,5 @@
+node_modules
+.vite
+dist
+build
 .env
-node_modules/
