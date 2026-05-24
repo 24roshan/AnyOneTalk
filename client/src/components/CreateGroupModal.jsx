@@ -9,7 +9,7 @@ const CreateGroupModal = ({ currentUser, onClose, onGroupCreated }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/users");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users`);
         setAllUsers(res.data);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -33,7 +33,7 @@ const CreateGroupModal = ({ currentUser, onClose, onGroupCreated }) => {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/groups/create", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/groups/create`, {
         name: groupName,
         memberIds: selectedUsers,
         creatorId: currentUser.id,

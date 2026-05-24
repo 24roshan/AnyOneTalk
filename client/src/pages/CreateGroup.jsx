@@ -9,7 +9,7 @@ const CreateGroup = ({ currentUserId }) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/users")
+      .get(`${import.meta.env.VITE_API_URL}/api/users`)
       .then((res) => setUsers(res.data))
       .catch((err) => console.log("Error fetching users", err));
   }, []);
@@ -29,7 +29,7 @@ const CreateGroup = ({ currentUserId }) => {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/groups/create", {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/groups/create`, {
         name: groupName,
         memberIds: selectedUserIds,
         creatorId: currentUserId,
