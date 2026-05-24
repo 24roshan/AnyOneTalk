@@ -7,10 +7,9 @@ const CreateGroup = ({ currentUserId }) => {
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [avatarUrl, setAvatarUrl] = useState("");
 
-  //  Get all users to select from
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/users") // Adjust if needed
+      .get("http://localhost:5000/api/users")
       .then((res) => setUsers(res.data))
       .catch((err) => console.log("Error fetching users", err));
   }, []);

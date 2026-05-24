@@ -10,8 +10,9 @@ import ProfileModal from "./components/ProfileModal";
 import TopBar from "./components/TopBar";
 import CreateGroupModal from "./components/CreateGroupModal";
 
+
 const ChatPage = () => {
-  const user = JSON.parse(sessionStorage.getItem("user")); // ✅ defined once
+  const user = JSON.parse(sessionStorage.getItem("user"));
 
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
@@ -34,12 +35,11 @@ const ChatPage = () => {
   const chatId = selectedGroup?.id
     ? `group_${selectedGroup.id}`
     : user?.id && receiverId
-    ? user.id < receiverId
-      ? `${user.id}_${receiverId}`
-      : `${receiverId}_${user.id}`
-    : null;
+      ? user.id < receiverId
+        ? `${user.id}_${receiverId}`
+        : `${receiverId}_${user.id}`
+      : null;
 
-  //  Get all users except self
   useEffect(() => {
     if (!user) return;
     axios
@@ -51,10 +51,8 @@ const ChatPage = () => {
       .catch(console.error);
   }, [user]);
 
-  // Fetch groups only once on mount
   useEffect(() => {
     if (!user?.id) return;
-    console.log("📦 Fetching groups for user ID:", user.id);
     axios
       .get(`http://localhost:5000/api/groups/user/${user.id}`)
       .then((res) => setGroups(res.data))
@@ -71,8 +69,10 @@ const ChatPage = () => {
     }
 
     socket.on("online_users", setOnlineUsers);
+
     socket.on("message received", (msg) => {
       if (!msg.chatId) return;
+
       setChatHistory((prev) => {
         const updated = [...(prev[msg.chatId] || []), msg];
         return { ...prev, [msg.chatId]: updated };
@@ -84,7 +84,9 @@ const ChatPage = () => {
     });
 
     socket.on("typing", ({ userId }) => {
-      if (userId !== user?.id) setTypingUser(`User ${userId} is typing...`);
+      if (userId !== user?.id) {
+        setTypingUser(`User ${userId} is typing...`);
+      }
     });
 
     socket.on("stop_typing", () => setTypingUser(null));
@@ -103,8 +105,8 @@ const ChatPage = () => {
     const newChatId = selectedGroup
       ? `group_${selectedGroup.id}`
       : user.id < receiverId
-      ? `${user.id}_${receiverId}`
-      : `${receiverId}_${user.id}`;
+        ? `${user.id}_${receiverId}`
+        : `${receiverId}_${user.id}`;
 
     socket.emit("join_chat", { chatId: newChatId });
     setMessages(chatHistory[newChatId] || []);
@@ -122,16 +124,21 @@ const ChatPage = () => {
     socket.on("messageEdited", ({ id, newContent }) => {
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.id === id ? { ...msg, content: newContent, edited: true } : msg
-        )
+          msg.id === id ? { ...msg, content: newContent, edited: true } : msg,
+        ),
       );
     });
 
     socket.on("messageDeleted", ({ id }) => {
       setMessages((prev) =>
-        prev.map((msg) => (msg.id === id ? { ...msg, deleted: true } : msg))
+        prev.map((msg) => (msg.id === id ? { ...msg, deleted: true } : msg)),
       );
     });
+
+    return () => {
+      socket.off("messageEdited");
+      socket.off("messageDeleted");
+    };
   }, []);
 
   const handleInputChange = (e) => {
@@ -150,13 +157,15 @@ const ChatPage = () => {
     }, 1500);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!newMsg.trim()) return;
+
+    const currentMsg = newMsg;
 
     const message = {
       chatId,
       senderId: user.id,
-      content: newMsg,
+      content: currentMsg,
       replyTo: replyTo?.id || null,
       isForwarded: false,
       originalSenderId: null,
@@ -164,24 +173,56 @@ const ChatPage = () => {
       isGroup: !!selectedGroup,
     };
 
-    socket.emit("send_message", message);
     setMessages((prev) => [...prev, message]);
+
     setChatHistory((prev) => ({
       ...prev,
       [chatId]: [...(prev[chatId] || []), message],
     }));
+
     setNewMsg("");
     setReplyTo(null);
+
+    if (receiverId === "ai_bot") {
+      try {
+        const res = await axios.post("http://localhost:5000/api/ai/ask", {
+          prompt: currentMsg,
+        });
+
+        const aiReply = {
+          chatId,
+          senderId: "ai_bot",
+          content: res.data.reply,
+          id: Date.now() + 1,
+        };
+
+        setMessages((prev) => [...prev, aiReply]);
+
+        setChatHistory((prev) => ({
+          ...prev,
+          [chatId]: [...(prev[chatId] || []), aiReply],
+        }));
+
+        return;
+      } catch (err) {
+        console.error("AI error:", err);
+        return;
+      }
+    }
+
+    socket.emit("send_message", message);
   };
 
   const handleReact = (msgId) => {
     const emoji = prompt("Enter emoji:");
     if (!emoji) return;
+
     const updated = messages.map((msg) =>
       msg.id === msgId
         ? { ...msg, reactions: [...(msg.reactions || []), emoji] }
-        : msg
+        : msg,
     );
+
     setMessages(updated);
     socket.emit("react_message", { msgId, emoji });
   };
@@ -192,6 +233,7 @@ const ChatPage = () => {
 
   const handleForwardToUser = (targetId) => {
     if (!targetId) return;
+
     const newChatId =
       user.id < targetId ? `${user.id}_${targetId}` : `${targetId}_${user.id}`;
 
@@ -206,6 +248,7 @@ const ChatPage = () => {
     };
 
     socket.emit("send_message", message);
+
     setChatHistory((prev) => ({
       ...prev,
       [newChatId]: [...(prev[newChatId] || []), message],
@@ -227,7 +270,7 @@ const ChatPage = () => {
     try {
       const { data } = await axios.post(
         "http://localhost:5000/api/upload",
-        formData
+        formData,
       );
       alert(`File uploaded: ${data.url}`);
     } catch (err) {
@@ -262,6 +305,13 @@ const ChatPage = () => {
 
   const getMessageById = (id) => messages.find((m) => m.id === id);
 
+  const aiUser = {
+    id: "ai_bot",
+    username: "AI Assistant",
+  };
+
+  const allUsers = [...userList, aiUser];
+
   return (
     <>
       <TopBar
@@ -273,11 +323,11 @@ const ChatPage = () => {
 
       <div className={styles.chatContainer}>
         <Sidebar
-          users={userList}
+          users={allUsers}
           receiverId={receiverId}
           setReceiverId={setReceiverId}
           currentUserId={user.id}
-          selectedGroup={selectedGroup} // ✅ Added
+          selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
           groups={groups}
         />
@@ -304,7 +354,6 @@ const ChatPage = () => {
                 currentUser={user}
                 onClose={() => setShowCreateGroupModal(false)}
                 onGroupCreated={() => {
-                  console.log(" Refetching groups...");
                   axios
                     .get(`http://localhost:5000/api/groups/user/${user.id}`)
                     .then((res) => setGroups(res.data))
@@ -317,10 +366,13 @@ const ChatPage = () => {
               Chat with:{" "}
               {selectedGroup
                 ? `Group - ${selectedGroup.name}`
-                : receiverId
-                ? `User ${receiverId}`
-                : "Select a chat"}
+                : receiverId === "ai_bot"
+                  ? "AI Assistant"
+                  : receiverId
+                    ? `User ${receiverId}`
+                    : "Select a chat"}
             </h3>
+
             <p>Chat ID: {chatId}</p>
             <p>
               Online: {onlineUsers.map((u) => u.username).join(", ") || "None"}
