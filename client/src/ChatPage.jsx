@@ -43,7 +43,7 @@ const ChatPage = () => {
   useEffect(() => {
     if (!user) return;
     axios
-      .get(`${import.meta.env.VITE_API_URL}/api/users`)
+      .get("http://localhost:5000/api/users")
       .then((res) => {
         const filtered = res.data.filter((u) => u.id !== user.id);
         setUserList(filtered);
@@ -54,7 +54,7 @@ const ChatPage = () => {
   useEffect(() => {
     if (!user?.id) return;
     axios
-      .get(`${import.meta.env.VITE_API_URL}/api/groups/user/${user.id}`)
+      .get(`http://localhost:5000/api/groups/user/${user.id}`)
       .then((res) => setGroups(res.data))
       .catch((err) => console.error("Error fetching groups:", err));
   }, [user?.id]);
@@ -183,9 +183,10 @@ const ChatPage = () => {
     setNewMsg("");
     setReplyTo(null);
 
+  
     if (receiverId === "ai_bot") {
       try {
-        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/ai/ask`, {
+        const res = await axios.post("http://localhost:5000/api/ai/ask", {
           prompt: currentMsg,
         });
 
@@ -269,7 +270,7 @@ const ChatPage = () => {
 
     try {
       const { data } = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/upload`,
+        "http://localhost:5000/api/upload",
         formData,
       );
       alert(`File uploaded: ${data.url}`);
@@ -284,7 +285,7 @@ const ChatPage = () => {
     if (!newContent || newContent.trim() === "") return;
 
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/messages/${id}`, {
+      await axios.put(`http://localhost:5000/api/messages/${id}`, {
         newContent,
       });
     } catch (err) {
@@ -297,7 +298,7 @@ const ChatPage = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/messages/${id}`);
+      await axios.delete(`http://localhost:5000/api/messages/${id}`);
     } catch (err) {
       console.error("Delete error:", err);
     }
@@ -355,9 +356,7 @@ const ChatPage = () => {
                 onClose={() => setShowCreateGroupModal(false)}
                 onGroupCreated={() => {
                   axios
-                    .get(
-                      `${import.meta.env.VITE_API_URL}/api/groups/user/${user.id}`,
-                    )
+                    .get(`http://localhost:5000/api/groups/user/${user.id}`)
                     .then((res) => setGroups(res.data))
                     .catch(console.error);
                 }}
