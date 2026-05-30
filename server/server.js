@@ -29,7 +29,7 @@ const server = http.createServer(app);
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-  "https://any-one-talk.vercel.app/",
+  "https://any-one-talk.vercel.app",
 ];
 
 const io = new Server(server, {
