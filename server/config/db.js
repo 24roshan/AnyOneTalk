@@ -1,6 +1,5 @@
-// config/db.js
 import dotenv from "dotenv";
-import mysql from "mysql2/promise"; // ✅ using promise API
+import mysql from "mysql2/promise"; 
 
 dotenv.config();
 

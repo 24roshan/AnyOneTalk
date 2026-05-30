@@ -43,7 +43,7 @@ const ChatPage = () => {
   useEffect(() => {
     if (!user) return;
     axios
-      .get("http://localhost:5000/api/users")
+      .get("https://anyonetalk-1.onrender.com/api/users")
       .then((res) => {
         const filtered = res.data.filter((u) => u.id !== user.id);
         setUserList(filtered);
@@ -54,7 +54,7 @@ const ChatPage = () => {
   useEffect(() => {
     if (!user?.id) return;
     axios
-      .get(`http://localhost:5000/api/groups/user/${user.id}`)
+      .get(`https://anyonetalk-1.onrender.com/api/groups/user/${user.id}`)
       .then((res) => setGroups(res.data))
       .catch((err) => console.error("Error fetching groups:", err));
   }, [user?.id]);
@@ -186,9 +186,12 @@ const ChatPage = () => {
   
     if (receiverId === "ai_bot") {
       try {
-        const res = await axios.post("http://localhost:5000/api/ai/ask", {
-          prompt: currentMsg,
-        });
+        const res = await axios.post(
+          "https://anyonetalk-1.onrender.com/api/ai/ask",
+          {
+            prompt: currentMsg,
+          },
+        );
 
         const aiReply = {
           chatId,
@@ -270,7 +273,7 @@ const ChatPage = () => {
 
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/upload",
+        "https://anyonetalk-1.onrender.com/api/upload",
         formData,
       );
       alert(`File uploaded: ${data.url}`);
@@ -285,7 +288,7 @@ const ChatPage = () => {
     if (!newContent || newContent.trim() === "") return;
 
     try {
-      await axios.put(`http://localhost:5000/api/messages/${id}`, {
+      await axios.put(`https://anyonetalk-1.onrender.com/api/messages/${id}`, {
         newContent,
       });
     } catch (err) {
@@ -298,7 +301,9 @@ const ChatPage = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/messages/${id}`);
+      await axios.delete(
+        `https://anyonetalk-1.onrender.com/api/messages/${id}`,
+      );
     } catch (err) {
       console.error("Delete error:", err);
     }
@@ -356,7 +361,9 @@ const ChatPage = () => {
                 onClose={() => setShowCreateGroupModal(false)}
                 onGroupCreated={() => {
                   axios
-                    .get(`http://localhost:5000/api/groups/user/${user.id}`)
+                    .get(
+                      `https://anyonetalk-1.onrender.com/api/groups/user/${user.id}`,
+                    )
                     .then((res) => setGroups(res.data))
                     .catch(console.error);
                 }}

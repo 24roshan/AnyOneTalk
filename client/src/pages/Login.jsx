@@ -11,10 +11,13 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
-        email,
-        password,
-      });
+      const res = await axios.post(
+        "https://anyonetalk-1.onrender.com/api/auth/login",
+        {
+          email,
+          password,
+        },
+      );
 
       sessionStorage.setItem("user", JSON.stringify(res.data.user));
       alert("Login successful");

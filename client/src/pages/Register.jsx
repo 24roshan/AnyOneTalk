@@ -17,11 +17,11 @@ const Register = () => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://anyonetalk-1.onrender.com/api/auth/register",
         form,
         {
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
       alert("Registration successful!");
       navigate("/login");
